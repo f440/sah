@@ -10,22 +10,22 @@ This project was heavily inspired by the [hub](https://hub.github.com/).
 
 ## Configuration
 
-    git config sah.default.user "f440"
-    git config sah.default.password "freq440@gmail.com"
-    git config sah.default.url "ssh://git@exmaple.com:7999"
+    git config [--global] sah.default.user "f440"
+    git config [--global] sah.default.password "freq440@gmail.com"
+    git config [--global] sah.default.ssh-url "ssh://git@exmaple.com:7999"
+    git config [--global] sah.default.base-url "https://exmaple.com"
 
 If you use multiple stash, define profile(s) and specify it.
 
-    git config sah.my_company.user "fuse"
-    git config sah.my_company.password "fuse@example.jp"
-    git config sah.my_company.url "https://example.jp"
+    git config [--global] sah.my_company.user "jane"
+    git config [--global] sah.my_company.password "jane@example.jp"
+    git config [--global] sah.my_company.ssh-url "ssh://git@exmaple.jp:7999"
+    git config [--global] sah.my_company.base-url "https://git@exmaple.jp"
 
     sah SUB_COMMAND --profile my_company
     or
     export SAH_DEFAULT_PROFILE=my_company
     sah SUB_COMMAND
-
-    $ gem install sah
 
 ## Usage
 
@@ -39,10 +39,32 @@ If you use multiple stash, define profile(s) and specify it.
     > git clone ssh://git@example.com:7999/project/repos
 
     sah clone repos
-    > git clone ssh://git@example.com:7999/~me/repos
+    > git clone ssh://git@example.com:7999/~my/repos
 
     sah clone ~user/repos
     > git clone ssh://git@example.com:7999/~user/repos
+
+### fork
+
+    sah fork
+    # fork from current repository to my/repo
+
+    sah fork project/repo
+    # fork from project/repo to my/repo
+
+    sah fork ~user/repo
+    # fork from ~user/repo to my/repo
+
+### remote
+
+    sah remote add remote-name project/repos
+    > git remote add remote-name $STASH_URL/project/repos
+
+    sah remote add remote-name ~user/repos
+    > git remote add remote-name $STASH_URL/~user/repos
+
+    sah remote add remote-name repos
+    > git remote add remote-name $STASH_URL/~my/repos
 
 ## Development
 
