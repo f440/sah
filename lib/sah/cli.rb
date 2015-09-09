@@ -162,26 +162,28 @@ module Sah
       system "git", "clone", Util.complete_url(repos, config)
     end
 
-    desc "create REPOS", "Create repository"
+    desc "create [PROJECT] [--name REPO_NAME]", "Create repository"
     long_desc <<-LONG_DESCRIPTION
-    sah create REPO
-    \x5# create a repository
+    sah create
+    \x5# create repository
+    \x5# repository name is same as the current repository
 
-    sah create PROJECT/REPO
-    \x5# create a repository in specific project
+    sah create --name REPO
+    \x5# create repository at ~YOUR_NAME/REPO
 
+    sah create PROJECT
+    \x5# create repository at PROJECT
+    \x5# repository name is same as the current repository
     LONG_DESCRIPTION
-    def create(repos=nil)
+    method_option :name, aliases: "-n", desc: "Set repository name"
+    def create(project=nil)
       config = Config.new(options[:profile])
       api = API.new(config)
 
-      if repos
-        repo, project = repos.split("/").reverse
-      else
-        repo = File.basename `git rev-parse --show-toplevel`.chomp
-        project = nil
-      end
       project ||= "~#{config.user}"
+      repo = (
+        options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
+      )
       api.create(project, repo)
     end
 

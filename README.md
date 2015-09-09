@@ -42,11 +42,16 @@ If you use multiple stash, define profile(s) and specify it.
 
 ### create
 
-    sah create REPO
-    # create a repository
+    sah create
+    # create repository
+    # repository name is same as the current repository
 
-    sah create PROJECT/REPO
-    # create a repository in specific project
+    sah create --name REPO
+    # create repository at ~YOUR_NAME/REPO
+
+    sah create PROJECT
+    # create repository at PROJECT
+    # repository name is same as the current repository
 
 ### fork
 
