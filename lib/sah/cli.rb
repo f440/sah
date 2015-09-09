@@ -18,11 +18,14 @@ module Sah
       end
     end
 
-    def fork(project, repo)
+    def fork(project, repo, name=nil)
+      body = {slug: repo}
+      body = body.merge(name: name) if name
+
       res = @conn.post do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos/#{repo}"
         req.headers['Content-Type'] = 'application/json'
-        req.body = {slug: repo}.to_json
+        req.body = body.to_json
       end
       if res.status != 201
         puts res.body["errors"].first["message"]
@@ -148,7 +151,7 @@ module Sah
     \x5> git clone ssh://git@example.com:7999/project/REPO
 
     sah clone REPO
-    \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO
+    \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/REPO
 
     sah clone ~USERNAME/REPO
     \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
@@ -182,17 +185,22 @@ module Sah
       api.create(project, repo)
     end
 
-    desc "fork [REPOS]", "Fork repository"
+    desc "fork [REPO] [--name REPO_NAME]", "Fork repository"
     long_desc <<-LONG_DESCRIPTION
     sah fork
-    \x5# fork from current repository to my/repo
+    \x5# fork from current repository to ~YOUR_NAME/REPO
+    \x5# repository name is same as the origin's one
 
-    sah fork project/repo
-    \x5# fork from project/repo to my/repo
+    sah fork --name MY_FORKED_REPO
+    \x5# fork from current repository to ~YOUR_NAME/MY_FORKED_REPO
 
-    sah fork ~user/repo
-    \x5# fork from ~user/repo to my/repo
+    sah fork PROJECT/REPO
+    \x5# fork from PROJECT/REPO to ~YOUR_NAME/REPO
+
+    sah fork ~USERNAME/REPO
+    \x5# fork from ~USERNAME/REPO to ~YOUR_NAME/REPO
     LONG_DESCRIPTION
+    method_option :name, aliases: "-n", desc: "Set repository name"
     def fork(repos=nil)
       config = Config.new(options[:profile])
       api = API.new(config)
@@ -206,7 +214,7 @@ module Sah
         end
         project, repo = $1, $2
       end
-      api.fork(project, repo)
+      api.fork(project, repo, options[:name])
     end
 
     desc "project [PROJECT]", "Show project information"

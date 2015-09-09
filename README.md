@@ -51,13 +51,17 @@ If you use multiple stash, define profile(s) and specify it.
 ### fork
 
     sah fork
-    # fork from current repository to YOUR_NAME/REPO
+    # fork from current repository to ~YOUR_NAME/REPO
+    # repository name is same as the origin's one
 
-    sah fork PROJECT/ERPO
-    # fork from PROJECT/REPO to YOUR_NAME/REPO
+    sah fork --name MY_FORKED_REPO
+    # fork from current repository to ~YOUR_NAME/MY_FORKED_REPO
+
+    sah fork PROJECT/REPO
+    # fork from PROJECT/REPO to ~YOUR_NAME/REPO
 
     sah fork ~USERNAME/REPO
-    # fork from ~YOURNAME/REPO to YOUR_NAME/REPO
+    # fork from ~USERNAME/REPO to ~YOUR_NAME/REPO
 
 ## help
 
