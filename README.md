@@ -33,6 +33,14 @@ If you use multiple stash, define profile(s) and specify it.
 
     sah help SUBCOMMAND
 
+### create
+
+    sah create [name]
+    # create a repository
+
+    sah create project/repo
+    # create a repository in specific project
+
 ### clone
 
     sah clone project/repos

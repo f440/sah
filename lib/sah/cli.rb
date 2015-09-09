@@ -22,9 +22,18 @@ module Sah
         req.headers['Content-Type'] = 'application/json'
         req.body = {slug: repo}.to_json
       end
-      if res.status == 201
-        puts "Done"
-      else
+      if res.status != 201
+        puts res.body["errors"].first["message"]
+      end
+    end
+
+    def create(project, repo)
+      res = @conn.post do |req|
+        req.url "/rest/api/1.0/projects/#{project}/repos"
+        req.headers['Content-Type'] = 'application/json'
+        req.body = {name: repo, scmId: "git", forkable: true}.to_json
+      end
+      if res.status != 201
         puts res.body["errors"].first["message"]
       end
     end
@@ -110,6 +119,28 @@ module Sah
       config = Config.new(options[:profile])
 
       system "git", "clone", Util.complete_url(repos, config)
+    end
+
+    desc "create REPOS", "Create repository"
+    long_desc <<-LONG_DESCRIPTION
+    sah create [name]
+    \x5# create new repository
+
+    sah create project/repos
+    \x5> create new repository in specific project
+    LONG_DESCRIPTION
+    def create(repos=nil)
+      config = Config.new(options[:profile])
+      api = API.new(config)
+
+      if repos
+        repo, project = repos.split("/").reverse
+      else
+        repo = File.basename `git rev-parse --show-toplevel`.chomp
+        project = nil
+      end
+      project ||= "~#{config.user}"
+      api.create(project, repo)
     end
 
     desc "version", "Display the version of this command"
