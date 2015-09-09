@@ -2,6 +2,8 @@ require "sah"
 require "thor"
 require 'faraday'
 require 'faraday_middleware'
+require 'hirb'
+require 'hirb-unicode'
 
 module Sah
   class API
@@ -37,6 +39,69 @@ module Sah
         puts res.body["errors"].first["message"]
       end
     end
+
+    def list_project
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/projects"
+        req.params['limit'] = 1000
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      res.body["values"].sort_by{|e| e["id"].to_i }
+    end
+
+    def show_project(project)
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/projects/#{project}"
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      res.body
+    end
+
+    def list_user
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/users"
+        req.params['limit'] = 1000
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      users = res.body["values"].sort_by{|e| e["id"].to_i }
+    end
+
+    def show_user(user)
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/users/#{user}"
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      res.body
+    end
+
+    def list_repository(project)
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/projects/#{project}/repos"
+        req.params['limit'] = 1000
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
+    end
+
+    def show_repository(project, repository)
+      res = @conn.get do |req|
+        req.url "/rest/api/1.0/projects/#{project}/repos/#{repository}"
+      end
+      if res.status != 200
+        puts res.body["errors"].first["message"]
+      end
+      res.body
+    end
   end
 
   class Util
@@ -55,14 +120,14 @@ module Sah
   class Remote < Thor
     desc "add NAME PROJECT_OR_USER/REPOS", 'remote add'
     long_desc <<-LONG_DESCRIPTION
-    sah remote add remote-name project/repos
-    \x5> git remote add remote-name $STASH_URL/project/repos
+    sah remote add REMOTE_NAME REPO
+    \x5> git remote add REMOTE_NAME $STASH_URL/~YOUR_NAME/REPO
 
-    sah remote add remote-name ~user/repos
-    \x5> git remote add remote-name $STASH_URL/~user/repos
+    sah remote add REMOTE_NAME PROJECT/REPO
+    \x5> git remote add REMOTE_NAME $STASH_URL/PROJECT/REPO
 
-    sah remote add remote-name repos
-    \x5> git remote add remote-name $STASH_URL/~my/repos
+    sah remote add REMOTE_NAME ~USERNAME/REPO
+    \x5> git remote add REMOTE_NAME $STASH_URL/~USERNAME/REPO
     LONG_DESCRIPTION
     def add(name, repos)
       config = Config.new(options[:profile])
@@ -76,6 +141,46 @@ module Sah
       type: :string, default: (ENV["SAH_DEFAULT_PROFILE"] || :default),
       desc: "Set a specific profile"
     register(Remote, 'remote', 'remote [COMMAND]', 'Manage remote repositories')
+
+    desc "clone REPOS", "Clone repository"
+    long_desc <<-LONG_DESCRIPTION
+    sah clone PROJECT/REPO
+    \x5> git clone ssh://git@example.com:7999/project/REPO
+
+    sah clone REPO
+    \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO
+
+    sah clone ~USERNAME/REPO
+    \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
+    LONG_DESCRIPTION
+    def clone(repos)
+      config = Config.new(options[:profile])
+
+      system "git", "clone", Util.complete_url(repos, config)
+    end
+
+    desc "create REPOS", "Create repository"
+    long_desc <<-LONG_DESCRIPTION
+    sah create REPO
+    \x5# create a repository
+
+    sah create PROJECT/REPO
+    \x5# create a repository in specific project
+
+    LONG_DESCRIPTION
+    def create(repos=nil)
+      config = Config.new(options[:profile])
+      api = API.new(config)
+
+      if repos
+        repo, project = repos.split("/").reverse
+      else
+        repo = File.basename `git rev-parse --show-toplevel`.chomp
+        project = nil
+      end
+      project ||= "~#{config.user}"
+      api.create(project, repo)
+    end
 
     desc "fork [REPOS]", "Fork repository"
     long_desc <<-LONG_DESCRIPTION
@@ -104,43 +209,68 @@ module Sah
       api.fork(project, repo)
     end
 
-    desc "clone REPOS", "Clone repository"
+    desc "project [PROJECT]", "Show project information"
     long_desc <<-LONG_DESCRIPTION
-    sah clone project/repos
-    \x5> git clone ssh://git@example.com:7999/project/repos
+    sah project
+    \x5# list projects
 
-    sah clone repos
-    \x5> git clone ssh://git@example.com:7999/~me/repos
-
-    sah clone ~user/repos
-    \x5> git clone ssh://git@example.com:7999/~user/repos
+    sah project PROJECT
+    \x5# show project detail
     LONG_DESCRIPTION
-    def clone(repos)
-      config = Config.new(options[:profile])
-
-      system "git", "clone", Util.complete_url(repos, config)
-    end
-
-    desc "create REPOS", "Create repository"
-    long_desc <<-LONG_DESCRIPTION
-    sah create [name]
-    \x5# create new repository
-
-    sah create project/repos
-    \x5> create new repository in specific project
-    LONG_DESCRIPTION
-    def create(repos=nil)
+    def project(project=nil)
       config = Config.new(options[:profile])
       api = API.new(config)
 
-      if repos
-        repo, project = repos.split("/").reverse
+      if project.nil?
+        projects = api.list_project
+        puts Hirb::Helpers::AutoTable.render(projects, fields: %w(id key name description))
       else
-        repo = File.basename `git rev-parse --show-toplevel`.chomp
-        project = nil
+        project = api.show_project(project)
+        puts Hirb::Helpers::AutoTable.render(project, headers: false)
       end
-      project ||= "~#{config.user}"
-      api.create(project, repo)
+    end
+
+    desc "repository PROJECT[/REPOS]", "Show repository information"
+    long_desc <<-LONG_DESCRIPTION
+    sah repository PROJECT
+    \x5# list repositories
+
+    sah repository PROJECT/REPO
+    \x5# show repository detail
+    LONG_DESCRIPTION
+    def repository(repo)
+      config = Config.new(options[:profile])
+      api = API.new(config)
+
+      project, repository = repo.split("/")
+      if repository.nil?
+        repositories = api.list_repository(project)
+        puts Hirb::Helpers::AutoTable.render(repositories, fields: %w(id slug name))
+      else
+        repository = api.show_repository(project, repository)
+        puts Hirb::Helpers::AutoTable.render(repository, headers: false)
+      end
+    end
+
+    desc "user [USER]", "Show user information"
+    long_desc <<-LONG_DESCRIPTION
+    sah user
+    \x5# list users
+
+    sah user USER
+    \x5# show user detail
+    LONG_DESCRIPTION
+    def user(user=nil)
+      config = Config.new(options[:profile])
+      api = API.new(config)
+
+      if user.nil?
+        users = api.list_user
+        puts Hirb::Helpers::AutoTable.render(users, fields: %w(id slug name displayName))
+      else
+        user = api.show_user(user)
+        puts Hirb::Helpers::AutoTable.render(user, headers: false)
+      end
     end
 
     desc "version", "Display the version of this command"

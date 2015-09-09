@@ -29,50 +29,80 @@ If you use multiple stash, define profile(s) and specify it.
 
 ## Usage
 
-### help
+### clone
 
-    sah help SUBCOMMAND
+    sah clone PROJECT/REPO
+    > git clone ssh://git@example.com:7999/project/REPO
+
+    sah clone REPO
+    > git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO
+
+    sah clone ~USERNAME/REPO
+    > git clone ssh://git@example.com:7999/~USERNAME/REPO
 
 ### create
 
-    sah create [name]
+    sah create REPO
     # create a repository
 
-    sah create project/repo
+    sah create PROJECT/REPO
     # create a repository in specific project
-
-### clone
-
-    sah clone project/repos
-    > git clone ssh://git@example.com:7999/project/repos
-
-    sah clone repos
-    > git clone ssh://git@example.com:7999/~my/repos
-
-    sah clone ~user/repos
-    > git clone ssh://git@example.com:7999/~user/repos
 
 ### fork
 
     sah fork
-    # fork from current repository to my/repo
+    # fork from current repository to YOUR_NAME/REPO
 
-    sah fork project/repo
-    # fork from project/repo to my/repo
+    sah fork PROJECT/ERPO
+    # fork from PROJECT/REPO to YOUR_NAME/REPO
 
-    sah fork ~user/repo
-    # fork from ~user/repo to my/repo
+    sah fork ~USERNAME/REPO
+    # fork from ~YOURNAME/REPO to YOUR_NAME/REPO
+
+## help
+
+    sah help [COMMAND]
+    # Describe available commands or one specific command
+
+### project
+
+    sah project
+    # list projects
+
+    sah project PROJECT
+    # show project detail
 
 ### remote
 
-    sah remote add remote-name project/repos
-    > git remote add remote-name $STASH_URL/project/repos
+    sah remote add REMOTE_NAME REPO
+    > git remote add REMOTE_NAME $STASH_URL/~YOUR_NAME/REPO
 
-    sah remote add remote-name ~user/repos
-    > git remote add remote-name $STASH_URL/~user/repos
+    sah remote add REMOTE_NAME PROJECT/REPO
+    > git remote add REMOTE_NAME $STASH_URL/PROJECT/REPO
 
-    sah remote add remote-name repos
-    > git remote add remote-name $STASH_URL/~my/repos
+    sah remote add REMOTE_NAME ~USERNAME/REPO
+    > git remote add REMOTE_NAME $STASH_URL/~USERNAME/REPO
+
+### repository
+
+    sah repository PROJECT
+    # list repositories
+
+    sah repository PROJECT REPO
+    # show repository detail
+
+### user
+
+    sah user
+    # list users
+
+    sah user USER
+    # show user detail
+
+### version
+
+    sah version
+    # Display the version of this command
 
 ## Development
 
