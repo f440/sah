@@ -107,43 +107,10 @@ module Sah
     end
   end
 
-  class Util
-    def self.complete_url(repos, config)
-      case repos
-      when %r%^[^/]+/[^/]+$%
-        "#{config.ssh_url}/#{repos}"
-      when %r%^[^/]+$%
-        "#{config.ssh_url}/~#{config.user}/#{repos}"
-      else
-        repos
-      end
-    end
-  end
-
-  class Remote < Thor
-    desc "add NAME PROJECT_OR_USER/REPOS", 'remote add'
-    long_desc <<-LONG_DESCRIPTION
-    sah remote add REMOTE_NAME REPO
-    \x5> git remote add REMOTE_NAME $STASH_URL/~YOUR_NAME/REPO
-
-    sah remote add REMOTE_NAME PROJECT/REPO
-    \x5> git remote add REMOTE_NAME $STASH_URL/PROJECT/REPO
-
-    sah remote add REMOTE_NAME ~USERNAME/REPO
-    \x5> git remote add REMOTE_NAME $STASH_URL/~USERNAME/REPO
-    LONG_DESCRIPTION
-    def add(name, repos)
-      config = Config.new(options[:profile])
-      remote_url = Util.complete_url(repos, config)
-      system "git", "remote", "add", name, remote_url
-    end
-  end
-
   class CLI < Thor
     class_option :profile,
       type: :string, default: (ENV["SAH_DEFAULT_PROFILE"] || :default),
       desc: "Set a specific profile"
-    register(Remote, 'remote', 'remote [COMMAND]', 'Manage remote repositories')
 
     desc "clone REPOS", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
@@ -159,7 +126,15 @@ module Sah
     def clone(repos)
       config = Config.new(options[:profile])
 
-      system "git", "clone", Util.complete_url(repos, config)
+      remote_url = case repos
+                   when %r%^[^/]+/[^/]+$%
+                     "#{config.ssh_url}/#{repos}"
+                   when %r%^[^/]+$%
+                     "#{config.ssh_url}/~#{config.user}/#{repos}"
+                   else
+                     repos
+                   end
+      system "git", "clone", remote_url
     end
 
     desc "create [PROJECT] [--name REPO_NAME]", "Create repository"

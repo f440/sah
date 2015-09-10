@@ -81,17 +81,6 @@ If you use multiple stash, define profile(s) and specify it.
     sah project PROJECT
     # show project detail
 
-### remote
-
-    sah remote add REMOTE_NAME REPO
-    > git remote add REMOTE_NAME $STASH_URL/~YOUR_NAME/REPO
-
-    sah remote add REMOTE_NAME PROJECT/REPO
-    > git remote add REMOTE_NAME $STASH_URL/PROJECT/REPO
-
-    sah remote add REMOTE_NAME ~USERNAME/REPO
-    > git remote add REMOTE_NAME $STASH_URL/~USERNAME/REPO
-
 ### repository
 
     sah repository PROJECT
