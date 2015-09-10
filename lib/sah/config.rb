@@ -5,16 +5,17 @@ module Sah
     def initialize(profile)
       @user, @password, @ssh_url, @base_url = nil, nil, nil, nil
 
-      config = %x(git config --get-regex "^sah\.#{profile}")
+      prefix = "sah\.profile\.#{profile}"
+      config = %x(git config --get-regex "^#{prefix}")
       config.each_line do |line|
         case line
-        when /sah\.#{profile}\.user (.*)$/
+        when /#{prefix}\.user (.*)$/
           @user = $1
-        when /sah\.#{profile}\.password (.*)$/
+        when /#{prefix}\.password (.*)$/
           @password = $1
-        when /sah\.#{profile}\.base-url (.*)$/
+        when /#{prefix}\.base-url (.*)$/
           @base_url = $1
-        when /sah\.#{profile}\.ssh-url (.*)$/
+        when /#{prefix}\.ssh-url (.*)$/
           @ssh_url = $1
         end
       end

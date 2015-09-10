@@ -10,17 +10,17 @@ This project was heavily inspired by the [hub](https://hub.github.com/).
 
 ## Configuration
 
-    git config [--global] sah.default.user "f440"
-    git config [--global] sah.default.password "freq440@gmail.com"
-    git config [--global] sah.default.ssh-url "ssh://git@exmaple.com:7999"
-    git config [--global] sah.default.base-url "https://exmaple.com"
+    git config [--global] sah.profile.default.user "f440"
+    git config [--global] sah.profile.default.password "freq440@gmail.com"
+    git config [--global] sah.profile.default.ssh-url "ssh://git@exmaple.com:7999"
+    git config [--global] sah.profile.default.base-url "https://exmaple.com"
 
 If you use multiple stash, define profile(s) and specify it.
 
-    git config [--global] sah.my_company.user "jane"
-    git config [--global] sah.my_company.password "jane@example.jp"
-    git config [--global] sah.my_company.ssh-url "ssh://git@exmaple.jp:7999"
-    git config [--global] sah.my_company.base-url "https://git@exmaple.jp"
+    git config [--global] sah.profile.my_company.user "jane"
+    git config [--global] sah.profile.my_company.password "jane@example.jp"
+    git config [--global] sah.profile.my_company.ssh-url "ssh://git@exmaple.jp:7999"
+    git config [--global] sah.profile.my_company.base-url "https://git@exmaple.jp"
 
     sah SUB_COMMAND --profile my_company
     or
