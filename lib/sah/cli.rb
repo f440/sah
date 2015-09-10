@@ -18,7 +18,7 @@ module Sah
       end
     end
 
-    def fork(project, repo, name=nil)
+    def fork_repo(project, repo, name=nil)
       body = {slug: repo}
       body = body.merge(name: name) if name
 
@@ -32,7 +32,7 @@ module Sah
       end
     end
 
-    def create(project, repo)
+    def create_repo(project, repo)
       res = @conn.post do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos"
         req.headers['Content-Type'] = 'application/json'
@@ -184,7 +184,7 @@ module Sah
       repo = (
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
       )
-      api.create(project, repo)
+      api.create_repo(project, repo)
     end
 
     desc "fork [REPO] [--name REPO_NAME]", "Fork repository"
@@ -216,7 +216,7 @@ module Sah
         end
         project, repo = $1, $2
       end
-      api.fork(project, repo, options[:name])
+      api.fork_repo(project, repo, options[:name])
     end
 
     desc "project [PROJECT]", "Show project information"
