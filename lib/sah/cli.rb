@@ -10,7 +10,7 @@ module Sah
     attr_accessor :conn
 
     def initialize(config)
-      @conn = Faraday.new(url: config.base_url) do |faraday|
+      @conn = Faraday.new(url: config.url) do |faraday|
         faraday.response :json
         # faraday.response :logger
         faraday.adapter Faraday.default_adapter
@@ -124,14 +124,12 @@ module Sah
     \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
     LONG_DESCRIPTION
     def clone(repos)
-      remote_url = case repos
-                   when %r%^[^/]+/[^/]+$%
-                     "#{config.ssh_url}/#{repos}"
-                   when %r%^[^/]+$%
-                     "#{config.ssh_url}/~#{config.user}/#{repos}"
-                   else
-                     repos
-                   end
+      repository, project = repos.split("/").reverse
+      project ||= "~#{config.user}"
+      repo_info = api.show_repository(project, repository)
+      abort if repo_info.key?("errors")
+      remote_url =
+        repo_info["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
       system "git", "clone", remote_url
     end
 
@@ -177,10 +175,8 @@ module Sah
       if repos
         project, repo = repos.split("/")
       else
-        remote_url = `git config --get remote.origin.url`
-        unless remote_url.match %r%^#{config.ssh_url}/([^/]+)/([^/]+).git$%
-          abort "Missing: #{remote_url}"
-        end
+        remote_url = `git config --get remote.origin.url`.chomp
+        remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
         project, repo = $1, $2
       end
       api.fork_repo(project, repo, options[:name])

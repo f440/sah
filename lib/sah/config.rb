@@ -1,9 +1,9 @@
 module Sah
   class Config
-    attr_accessor :user, :password, :ssh_url, :base_url
+    attr_accessor :user, :password, :url
 
     def initialize(profile)
-      @user, @password, @ssh_url, @base_url = nil, nil, nil, nil
+      @user, @password, @url = nil, nil, nil
 
       prefix = "sah\.profile\.#{profile}"
       config = %x(git config --get-regex "^#{prefix}")
@@ -13,14 +13,12 @@ module Sah
           @user = $1
         when /#{prefix}\.password (.*)$/
           @password = $1
-        when /#{prefix}\.base-url (.*)$/
-          @base_url = $1
-        when /#{prefix}\.ssh-url (.*)$/
-          @ssh_url = $1
+        when /#{prefix}\.url (.*)$/
+          @url = $1
         end
       end
 
-      unless @user && @password && @ssh_url && @base_url
+      unless @user && @password && @url
         abort "Invalid profile: #{profile}"
       end
     end
