@@ -4,7 +4,7 @@ Sah is command line util for [Atlassian Stash](https://www.atlassian.com/softwar
 
 This project was heavily inspired by the [hub](https://hub.github.com/).
 
-## (not impremented) Installation
+## Installation
 
     gem install sah
 
