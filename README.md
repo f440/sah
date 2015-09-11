@@ -87,6 +87,23 @@ If you use multiple stash, define profile(s) and specify it.
     sah repository PROJECT REPO
     # show repository detail
 
+### upstream
+
+    upstream
+    # show upstream information
+
+    upstream --add-remote [--fetch-pull-request] [--prevent-push]
+    # add upstream to remote settings
+
+#### configutration
+
+- `git config --global sah.config.upstream-fetch-pull-request true`  
+  (the same as `--fetch-pull-request` option)  
+  Setting this option to true will fetch all pull requests.
+- `git config --global sah.config.upstream-prevent-push true`  
+  (the same as `--prevent-push` option)  
+  Setting this option to true will Prevent push to upstream repository.
+
 ### user
 
     sah user

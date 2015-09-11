@@ -219,6 +219,40 @@ module Sah
       end
     end
 
+    desc "upstream [--add-remote [--fetch-pull-request] [--prevent-push]]",
+      "Show upstream information"
+    long_desc <<-LONG_DESCRIPTION
+    upstream
+    \x5# show upstream information
+
+    upstream --add-remote [--fetch-pull-request] [--prevent-push]
+    \x5# add upstream to remote settings
+    LONG_DESCRIPTION
+    method_option :"add-remote", desc: "Add a upstream repository to remote settings"
+    method_option :"fetch-pull-request", desc: "Fetch pull requests"
+    method_option :"prevent-push", desc: "Prevent push to upstream"
+    def upstream
+      remote_url = `git config --get remote.origin.url`.chomp
+      remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
+      project, repository = $1, $2
+      repo_info = api.show_repository(project, repository)
+      abort if repo_info.key?("errors")
+      upstream_url =
+        repo_info["origin"]["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+      if options[:"add-remote"]
+        system "git", "remote", "add", "upstream", upstream_url
+        if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
+            %x(git config --add remote.upstream.fetch \
+                 '+refs/pull-requests/*:refs/remotes/upstream/pull-requests/*')
+        end
+        if config.upstream_prevent_push || options[:"prevent-push"]
+          %x(git remote set-url --push upstream "")
+        end
+      else
+        puts upstream_url
+      end
+    end
+
     desc "user [USER]", "Show user information"
     long_desc <<-LONG_DESCRIPTION
     sah user
