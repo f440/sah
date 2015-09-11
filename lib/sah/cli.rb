@@ -124,8 +124,6 @@ module Sah
     \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
     LONG_DESCRIPTION
     def clone(repos)
-      config = Config.new(options[:profile])
-
       remote_url = case repos
                    when %r%^[^/]+/[^/]+$%
                      "#{config.ssh_url}/#{repos}"
@@ -152,9 +150,6 @@ module Sah
     LONG_DESCRIPTION
     method_option :name, aliases: "-n", desc: "Set repository name"
     def create(project=nil)
-      config = Config.new(options[:profile])
-      api = API.new(config)
-
       project ||= "~#{config.user}"
       repo = (
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
@@ -179,9 +174,6 @@ module Sah
     LONG_DESCRIPTION
     method_option :name, aliases: "-n", desc: "Set repository name"
     def fork(repos=nil)
-      config = Config.new(options[:profile])
-      api = API.new(config)
-
       if repos
         project, repo = repos.split("/")
       else
@@ -203,9 +195,6 @@ module Sah
     \x5# show project detail
     LONG_DESCRIPTION
     def project(project=nil)
-      config = Config.new(options[:profile])
-      api = API.new(config)
-
       if project.nil?
         projects = api.list_project
         puts Hirb::Helpers::AutoTable.render(projects, fields: %w(id key name description))
@@ -224,9 +213,6 @@ module Sah
     \x5# show repository detail
     LONG_DESCRIPTION
     def repository(repo)
-      config = Config.new(options[:profile])
-      api = API.new(config)
-
       project, repository = repo.split("/")
       if repository.nil?
         repositories = api.list_repository(project)
@@ -246,9 +232,6 @@ module Sah
     \x5# show user detail
     LONG_DESCRIPTION
     def user(user=nil)
-      config = Config.new(options[:profile])
-      api = API.new(config)
-
       if user.nil?
         users = api.list_user
         puts Hirb::Helpers::AutoTable.render(users, fields: %w(id slug name displayName))
@@ -261,6 +244,16 @@ module Sah
     desc "version", "Display the version of this command"
     def version
       puts VERSION
+    end
+
+    private
+
+    def config
+      @config ||= Config.new(options[:profile])
+    end
+
+    def api
+      @api ||= API.new(config)
     end
   end
 end
