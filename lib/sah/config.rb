@@ -18,7 +18,7 @@ module Sah
         when /#{profile_prefix}\.password (.*)$/
           @password = $1
         when /#{profile_prefix}\.url (.*)$/
-          @url = $1
+          @url = URI.parse $1
         when /#{config_prefix}\.upstream-fetch-pull-request (.*)$/
           @upstream_fetch_pull_request = ($1 == "true")
         when /#{config_prefix}\.upstream-prevent-push (.*)$/

@@ -4,10 +4,13 @@ require 'faraday_middleware'
 
 module Sah
   class API
-    attr_accessor :conn
+    attr_accessor :config, :conn
 
     def initialize(config)
-      @conn = Faraday.new(url: config.url) do |faraday|
+      @config = config
+
+      base_url = (config.url).to_s.sub(/#{config.url.path}$/, '')
+      @conn = Faraday.new(url: base_url) do |faraday|
         faraday.response :json
         # faraday.response :logger
         faraday.adapter Faraday.default_adapter
@@ -20,7 +23,7 @@ module Sah
       body = body.merge(name: name) if name
 
       @conn.post do |req|
-        req.url "/rest/api/1.0/projects/#{project}/repos/#{repo}"
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos/#{repo}"
         req.headers['Content-Type'] = 'application/json'
         req.body = body.to_json
       end
@@ -28,48 +31,48 @@ module Sah
 
     def create_repo(project, repo)
       @conn.post do |req|
-        req.url "/rest/api/1.0/projects/#{project}/repos"
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos"
         req.headers['Content-Type'] = 'application/json'
         req.body = {name: repo, scmId: "git", forkable: true}.to_json
       end
     end
 
     def list_project
-       @conn.get do |req|
-        req.url "/rest/api/1.0/projects"
+      @conn.get do |req|
+        req.url @config.url.path + "/rest/api/1.0/projects"
         req.params['limit'] = 1000
       end
     end
 
     def show_project(project)
       @conn.get do |req|
-        req.url "/rest/api/1.0/projects/#{project}"
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}"
       end
     end
 
     def list_user
       @conn.get do |req|
-        req.url "/rest/api/1.0/users"
+        req.url @config.url.path + "/rest/api/1.0/users"
         req.params['limit'] = 1000
       end
     end
 
     def show_user(user)
        @conn.get do |req|
-        req.url "/rest/api/1.0/users/#{user}"
+        req.url @config.url.path + "/rest/api/1.0/users/#{user}"
       end
     end
 
     def list_repository(project)
       @conn.get do |req|
-        req.url "/rest/api/1.0/projects/#{project}/repos"
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos"
         req.params['limit'] = 1000
       end
     end
 
     def show_repository(project, repository)
       @conn.get do |req|
-        req.url "/rest/api/1.0/projects/#{project}/repos/#{repository}"
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos/#{repository}"
       end
     end
   end
