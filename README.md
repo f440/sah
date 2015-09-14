@@ -103,6 +103,8 @@ If you use multiple stash, define profile(s) and specify it.
 - `git config --global sah.config.upstream-prevent-push true`  
   (the same as `--prevent-push` option)  
   Setting this option to true will Prevent push to upstream repository.
+- `git config --global sah.config.sah.git-protocol [ssh|http]`  
+  Setting this option to specify git protocol. (default: ssh)
 
 ### user
 

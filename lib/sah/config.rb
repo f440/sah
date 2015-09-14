@@ -1,12 +1,16 @@
+require 'uri'
+
 module Sah
   class Config
     attr_accessor :user, :password, :url,
-      :upstream_fetch_pull_request, :upstream_prevent_push
+      :upstream_fetch_pull_request, :upstream_prevent_push,
+      :git_protocol
 
     def initialize(profile)
       @user, @password, @url = nil, nil, nil
       @upstream_fetch_pull_request = false
       @upstream_prevent_push = false
+      @git_protocol = "ssh"
 
       profile_prefix = "sah\.profile\.#{profile}"
       config_prefix = "sah\.config"
@@ -23,6 +27,8 @@ module Sah
           @upstream_fetch_pull_request = ($1 == "true")
         when /#{config_prefix}\.upstream-prevent-push (.*)$/
           @upstream_prevent_push = ($1 == "true")
+        when /#{config_prefix}\.git-protocol (.*)$/
+          @git_protocol = $1
         end
       end
 

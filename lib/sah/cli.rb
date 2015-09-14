@@ -29,7 +29,7 @@ module Sah
       end
       repository = res.body
       remote_url =
-        repository["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+        repository["links"]["clone"].find{ |e| e["name"] == config.git_protocol }["href"]
       system "git", "clone", remote_url
     end
 
@@ -57,7 +57,7 @@ module Sah
         abort res.body["errors"].first["message"]
       end
       remote_url =
-        res.body["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+        res.body["links"]["clone"].find{ |e| e["name"] == config.git_protocol }["href"]
       system "git", "remote", "add", "origin", remote_url
     end
 
@@ -166,7 +166,7 @@ module Sah
       end
       repository = res.body
       upstream_url =
-        repository["origin"]["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+        repository["origin"]["links"]["clone"].find{ |e| e["name"] == config.git_protocol }["href"]
       if options[:"add-remote"]
         system "git", "remote", "add", "upstream", upstream_url
         if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
