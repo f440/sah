@@ -8,6 +8,9 @@ module Sah
     class_option :profile,
       type: :string, default: (ENV["SAH_DEFAULT_PROFILE"] || :default),
       desc: "Set a specific profile"
+    class_option :verbose,
+      type: :boolean, default: false,
+      desc: "Turn on/off verbose mode"
 
     desc "clone REPOS", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
@@ -215,7 +218,7 @@ module Sah
     private
 
     def config
-      @config ||= Config.new(options[:profile])
+      @config ||= Config.new(options[:profile], verbose: options[:verbose])
     end
 
     def api

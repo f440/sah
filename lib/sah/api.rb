@@ -12,7 +12,7 @@ module Sah
       base_url = (config.url).to_s.sub(/#{config.url.path}$/, '')
       @conn = Faraday.new(url: base_url) do |faraday|
         faraday.response :json
-        # faraday.response :logger
+        faraday.response :logger if config.verbose
         faraday.adapter Faraday.default_adapter
         faraday.basic_auth config.user, config.password
       end

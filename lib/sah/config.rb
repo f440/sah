@@ -4,13 +4,14 @@ module Sah
   class Config
     attr_accessor :user, :password, :url,
       :upstream_fetch_pull_request, :upstream_prevent_push,
-      :git_protocol
+      :git_protocol, :verbose
 
-    def initialize(profile)
+    def initialize(profile, verbose: false)
       @user, @password, @url = nil, nil, nil
       @upstream_fetch_pull_request = false
       @upstream_prevent_push = false
       @git_protocol = "ssh"
+      @verbose = verbose
 
       profile_prefix = "sah\.profile\.#{profile}"
       config_prefix = "sah\.config"
