@@ -41,6 +41,7 @@ module Sah
       if res.status != 201
         puts res.body["errors"].first["message"]
       end
+      res
     end
 
     def list_project
@@ -152,7 +153,10 @@ module Sah
       repo = (
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
       )
-      api.create_repo(project, repo)
+      res = api.create_repo(project, repo)
+      remote_url =
+        res.body["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+      system "git", "remote", "add", "origin", remote_url
     end
 
     desc "fork [REPO] [--name REPO_NAME]", "Fork repository"
