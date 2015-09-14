@@ -4,13 +4,13 @@ module Sah
   class Config
     attr_accessor :user, :password, :url,
       :upstream_fetch_pull_request, :upstream_prevent_push,
-      :git_protocol, :verbose
+      :protocol, :verbose
 
     def initialize(profile, verbose: false)
       @user, @password, @url = nil, nil, nil
       @upstream_fetch_pull_request = false
       @upstream_prevent_push = false
-      @git_protocol = "ssh"
+      @protocol = "ssh"
       @verbose = verbose
 
       profile_prefix = "sah\.profile\.#{profile}"
@@ -28,13 +28,16 @@ module Sah
           @upstream_fetch_pull_request = ($1 == "true")
         when /#{config_prefix}\.upstream-prevent-push (.*)$/
           @upstream_prevent_push = ($1 == "true")
-        when /#{config_prefix}\.git-protocol (.*)$/
-          @git_protocol = $1
+        when /#{config_prefix}\.protocol (.*)$/
+          @protocol = $1
         end
       end
 
       unless @user && @password && @url
         abort "Invalid profile: #{profile}"
+      end
+      unless ["ssh", "http"].include? @protocol
+        abort "protocol must be set to ssh or http: #{@protocol}"
       end
     end
   end
