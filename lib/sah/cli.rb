@@ -22,89 +22,58 @@ module Sah
       body = {slug: repo}
       body = body.merge(name: name) if name
 
-      res = @conn.post do |req|
+      @conn.post do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos/#{repo}"
         req.headers['Content-Type'] = 'application/json'
         req.body = body.to_json
       end
-      if res.status != 201
-        puts res.body["errors"].first["message"]
-      end
     end
 
     def create_repo(project, repo)
-      res = @conn.post do |req|
+      @conn.post do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos"
         req.headers['Content-Type'] = 'application/json'
         req.body = {name: repo, scmId: "git", forkable: true}.to_json
       end
-      if res.status != 201
-        puts res.body["errors"].first["message"]
-      end
-      res
     end
 
     def list_project
-      res = @conn.get do |req|
+       @conn.get do |req|
         req.url "/rest/api/1.0/projects"
         req.params['limit'] = 1000
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      res.body["values"].sort_by{|e| e["id"].to_i }
     end
 
     def show_project(project)
-      res = @conn.get do |req|
+      @conn.get do |req|
         req.url "/rest/api/1.0/projects/#{project}"
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      res.body
     end
 
     def list_user
-      res = @conn.get do |req|
+      @conn.get do |req|
         req.url "/rest/api/1.0/users"
         req.params['limit'] = 1000
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      users = res.body["values"].sort_by{|e| e["id"].to_i }
     end
 
     def show_user(user)
-      res = @conn.get do |req|
+       @conn.get do |req|
         req.url "/rest/api/1.0/users/#{user}"
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      res.body
     end
 
     def list_repository(project)
-      res = @conn.get do |req|
+      @conn.get do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos"
         req.params['limit'] = 1000
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
     end
 
     def show_repository(project, repository)
-      res = @conn.get do |req|
+      @conn.get do |req|
         req.url "/rest/api/1.0/projects/#{project}/repos/#{repository}"
       end
-      if res.status != 200
-        puts res.body["errors"].first["message"]
-      end
-      res.body
     end
   end
 
@@ -127,10 +96,13 @@ module Sah
     def clone(repos)
       repository, project = repos.split("/").reverse
       project ||= "~#{config.user}"
-      repo_info = api.show_repository(project, repository)
-      abort if repo_info.key?("errors")
+      res = api.show_repository(project, repository)
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
+      repository = res.body
       remote_url =
-        repo_info["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+        repository["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
       system "git", "clone", remote_url
     end
 
@@ -154,6 +126,9 @@ module Sah
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
       )
       res = api.create_repo(project, repo)
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
       remote_url =
         res.body["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
       system "git", "remote", "add", "origin", remote_url
@@ -183,7 +158,10 @@ module Sah
         remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
         project, repo = $1, $2
       end
-      api.fork_repo(project, repo, options[:name])
+      res = api.fork_repo(project, repo, options[:name])
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
     end
 
     desc "project [PROJECT]", "Show project information"
@@ -196,10 +174,18 @@ module Sah
     LONG_DESCRIPTION
     def project(project=nil)
       if project.nil?
-        projects = api.list_project
+        res = api.list_project
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        projects = res.body["values"].sort_by{|e| e["id"].to_i }
         puts Hirb::Helpers::AutoTable.render(projects, fields: %w(id key name description))
       else
-        project = api.show_project(project)
+        res = api.show_project(project)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        project = res.body
         puts Hirb::Helpers::AutoTable.render(project, headers: false)
       end
     end
@@ -215,10 +201,18 @@ module Sah
     def repository(repo)
       project, repository = repo.split("/")
       if repository.nil?
-        repositories = api.list_repository(project)
+        res = api.list_repository(project)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
         puts Hirb::Helpers::AutoTable.render(repositories, fields: %w(id slug name))
       else
-        repository = api.show_repository(project, repository)
+        res = api.show_repository(project, repository)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        repository = res.body
         puts Hirb::Helpers::AutoTable.render(repository, headers: false)
       end
     end
@@ -239,10 +233,13 @@ module Sah
       remote_url = `git config --get remote.origin.url`.chomp
       remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
       project, repository = $1, $2
-      repo_info = api.show_repository(project, repository)
-      abort if repo_info.key?("errors")
+      res = api.show_repository(project, repository)
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
+      repository = res.body
       upstream_url =
-        repo_info["origin"]["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
+        repository["origin"]["links"]["clone"].find{ |e| e["name"] == "ssh" }["href"]
       if options[:"add-remote"]
         system "git", "remote", "add", "upstream", upstream_url
         if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
@@ -267,10 +264,18 @@ module Sah
     LONG_DESCRIPTION
     def user(user=nil)
       if user.nil?
-        users = api.list_user
+        res = api.list_user
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        users = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
         puts Hirb::Helpers::AutoTable.render(users, fields: %w(id slug name displayName))
       else
-        user = api.show_user(user)
+        res = api.show_user(user)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        user = res.body
         puts Hirb::Helpers::AutoTable.render(user, headers: false)
       end
     end
