@@ -15,7 +15,7 @@ module Sah
     desc "clone REPOS", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
     sah clone PROJECT/REPO
-    \x5> git clone ssh://git@example.com:7999/project/REPO
+    \x5> git clone ssh://git@example.com:7999/PROJECT/REPO
 
     sah clone REPO
     \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/REPO
@@ -36,7 +36,7 @@ module Sah
       system "git", "clone", remote_url
     end
 
-    desc "create [PROJECT] [--name REPO_NAME]", "Create repository"
+    desc "create [PROJECT]", "Create repository"
     long_desc <<-LONG_DESCRIPTION
     sah create
     \x5# create repository
@@ -64,7 +64,7 @@ module Sah
       system "git", "remote", "add", "origin", remote_url
     end
 
-    desc "fork [REPO] [--name REPO_NAME]", "Fork repository"
+    desc "fork [REPO]", "Fork repository"
     long_desc <<-LONG_DESCRIPTION
     sah fork
     \x5# fork from current repository to ~YOUR_NAME/REPO
@@ -147,7 +147,7 @@ module Sah
       end
     end
 
-    desc "upstream [--add-remote [--fetch-pull-request] [--prevent-push]]",
+    desc "upstream",
       "Show upstream information"
     long_desc <<-LONG_DESCRIPTION
     upstream

@@ -30,7 +30,7 @@ If you use multiple stash, define profile(s) and specify it.
 ### clone
 
     sah clone PROJECT/REPO
-    > git clone ssh://git@example.com:7999/project/REPO
+    > git clone ssh://git@example.com:7999/PROJECT/REPO
 
     sah clone REPO
     > git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO
