@@ -20,10 +20,10 @@ module Sah
     sah clone ~USERNAME/REPO
     \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
     LONG_DESCRIPTION
-    def clone(repos)
-      repository, project = repos.split("/").reverse
-      project ||= "~#{config.user}"
-      res = api.show_repository(project, repository)
+    def clone(arg)
+      repository_slug, project_key = arg.split("/").reverse
+      project_key ||= "~#{config.user}"
+      res = api.show_repository(project_key, repository_slug)
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
@@ -47,12 +47,12 @@ module Sah
     \x5# repository name is same as the current repository
     LONG_DESCRIPTION
     method_option :name, aliases: "-n", desc: "Set repository name"
-    def create(project=nil)
-      project ||= "~#{config.user}"
-      repo = (
+    def create(arg=nil)
+      project_key = (arg || "~#{config.user}")
+      repository_slug = (
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
       )
-      res = api.create_repo(project, repo)
+      res = api.create_repo(project_key, repository_slug)
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
@@ -77,15 +77,15 @@ module Sah
     \x5# fork from ~USERNAME/REPO to ~YOUR_NAME/REPO
     LONG_DESCRIPTION
     method_option :name, aliases: "-n", desc: "Set repository name"
-    def fork(repos=nil)
-      if repos
-        project, repo = repos.split("/")
+    def fork(arg=nil)
+      if arg
+        project_key, repository_slug = arg.split("/")
       else
         remote_url = `git config --get remote.origin.url`.chomp
         remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
-        project, repo = $1, $2
+        project_key, repository_slug = $1, $2
       end
-      res = api.fork_repo(project, repo, options[:name])
+      res = api.fork_repo(project_key, repository_slug, options[:name])
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
@@ -99,21 +99,21 @@ module Sah
     sah project PROJECT
     \x5# show project detail
     LONG_DESCRIPTION
-    def project(project=nil)
-      if project.nil?
+    def project(arg=nil)
+      if arg
+        res = api.show_project(arg)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        project = res.body
+        puts Hirb::Helpers::AutoTable.render(project, headers: false)
+      else
         res = api.list_project
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         projects = res.body["values"].sort_by{|e| e["id"].to_i }
         puts Hirb::Helpers::AutoTable.render(projects, fields: %w(id key name description))
-      else
-        res = api.show_project(project)
-        if res.body.key? "errors"
-          abort res.body["errors"].first["message"]
-        end
-        project = res.body
-        puts Hirb::Helpers::AutoTable.render(project, headers: false)
       end
     end
 
@@ -125,22 +125,22 @@ module Sah
     sah repository PROJECT/REPO
     \x5# show repository detail
     LONG_DESCRIPTION
-    def repository(repo)
-      project, repository = repo.split("/")
-      if repository.nil?
-        res = api.list_repository(project)
-        if res.body.key? "errors"
-          abort res.body["errors"].first["message"]
-        end
-        repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
-        puts Hirb::Helpers::AutoTable.render(repositories, fields: %w(id slug name))
-      else
-        res = api.show_repository(project, repository)
+    def repository(arg)
+      project_key, repository_slug = arg.split("/")
+      if repository_slug
+        res = api.show_repository(project_key, repository_slug)
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         repository = res.body
         puts Hirb::Helpers::AutoTable.render(repository, headers: false)
+      else
+        res = api.list_repository(project_key)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
+        puts Hirb::Helpers::AutoTable.render(repositories, fields: %w(id slug name))
       end
     end
 
@@ -189,21 +189,21 @@ module Sah
     sah user USER
     \x5# show user detail
     LONG_DESCRIPTION
-    def user(user=nil)
-      if user.nil?
+    def user(arg=nil)
+      if arg
+        res = api.show_user(arg)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        user = res.body
+        puts Hirb::Helpers::AutoTable.render(user, headers: false)
+      else
         res = api.list_user
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         users = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
         puts Hirb::Helpers::AutoTable.render(users, fields: %w(id slug name displayName))
-      else
-        res = api.show_user(user)
-        if res.body.key? "errors"
-          abort res.body["errors"].first["message"]
-        end
-        user = res.body
-        puts Hirb::Helpers::AutoTable.render(user, headers: false)
       end
     end
 
