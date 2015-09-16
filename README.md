@@ -38,6 +38,12 @@ If you use multiple stash, define profile(s) and specify it.
     sah browse PROJECT/REPO
     # browse PROJECT/REPO
 
+    sah browse --branch
+    # browse branch list in current repository
+
+    sah browse --branch BRANCH
+    # browse BRANCH in current repository
+
 ### clone
 
     sah clone PROJECT/REPO

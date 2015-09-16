@@ -24,7 +24,14 @@ module Sah
 
     sah browse PROJECT/REPO
     \x5# browse PROJECT/REPO
+
+    sah browse --branch
+    \x5# browse branch list in current repository
+
+    sah browse --branch BRANCH
+    \x5# browse BRANCH in current repository
     LONG_DESCRIPTION
+    method_option :branch, aliases: "-b", desc: "Show branch(es)"
     def browse(arg=nil)
       if arg
         repository_slug, project_key = arg.split("/").reverse
@@ -38,7 +45,20 @@ module Sah
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
-      Launchy.open(config.url + res.body["link"]["url"], debug: config.verbose)
+
+      url = config.url + res.body["link"]["url"]
+      case options[:branch]
+      when nil
+        # skip
+      when "branch"
+        url.path = url.path.sub('/browse', '/branches')
+      else
+        url.path = url.path.sub('/browse', '/commits')
+        url.query =
+          URI.encode_www_form([["until", "refs/heads/#{options['branch']}"]])
+      end
+
+      Launchy.open(url, debug: config.verbose)
     end
 
     desc "clone REPOS", "Clone repository"
