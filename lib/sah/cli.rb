@@ -30,8 +30,12 @@ module Sah
 
     sah browse --branch BRANCH
     \x5# browse BRANCH in current repository
+
+    sah browse --commit COMMITHASH
+    \x5# browse COMMITHASH in current repository
     LONG_DESCRIPTION
     method_option :branch, aliases: "-b", desc: "Show branch(es)"
+    method_option :commit, aliases: "-c", desc: "Show commit"
     def browse(arg=nil)
       if arg
         repository_slug, project_key = arg.split("/").reverse
@@ -47,6 +51,11 @@ module Sah
       end
 
       url = config.url + res.body["link"]["url"]
+
+      if options[:branch] && options[:commit]
+        abort "Multiple options (--branch, --commit) cannot be handled."
+      end
+
       case options[:branch]
       when nil
         # skip
@@ -56,6 +65,15 @@ module Sah
         url.path = url.path.sub('/browse', '/commits')
         url.query =
           URI.encode_www_form([["until", "refs/heads/#{options['branch']}"]])
+      end
+
+      case options[:commit]
+      when nil
+        # skip
+      when "commit"
+        abort 'You must specify commit hash.'
+      else
+        url.path = url.path.sub('/browse', "/commits/#{options['commit']}")
       end
 
       Launchy.open(url, debug: config.verbose)

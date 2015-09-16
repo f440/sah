@@ -44,6 +44,9 @@ If you use multiple stash, define profile(s) and specify it.
     sah browse --branch BRANCH
     # browse BRANCH in current repository
 
+    sah browse --commit COMMITHASH
+    # browse COMMITHASH in current repository
+
 ### clone
 
     sah clone PROJECT/REPO
