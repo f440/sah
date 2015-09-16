@@ -246,13 +246,20 @@ module Sah
       remote_url = `git config --get remote.origin.url`.chomp
       remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
       project, repository = $1, $2
+
       res = api.show_repository(project, repository)
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
+
       repository = res.body
+      unless repository.key? "origin"
+        abort "Upstream repos does not exist."
+      end
+
       upstream_url =
         repository["origin"]["links"]["clone"].find{ |e| e["name"] == config.protocol }["href"]
+
       if options[:"add-remote"]
         system "git", "remote", "add", "upstream", upstream_url
         if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
