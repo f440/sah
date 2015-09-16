@@ -24,7 +24,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "faraday", "~> 0.9.1"
   spec.add_dependency "faraday_middleware", "~> 0.10.0"
   spec.add_dependency "hirb", "~> 0.7.3"
-  spec.add_dependency 'hirb-unicode', "~> 0.0.5"
+  spec.add_dependency "hirb-unicode", "~> 0.0.5"
+  spec.add_dependency "launchy", "~> 2.4.3"
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"

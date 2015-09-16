@@ -27,6 +27,17 @@ If you use multiple stash, define profile(s) and specify it.
 
 ## Usage
 
+### browse
+
+    sah browse
+    # browse current repository
+
+    sah browse REPO
+    # browse ~YOUR_NAME/REPO
+
+    sah browse PROJECT/REPO
+    # browse PROJECT/REPO
+
 ### clone
 
     sah clone PROJECT/REPO

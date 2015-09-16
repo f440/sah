@@ -1,7 +1,8 @@
 require "sah"
 require "thor"
-require 'hirb'
-require 'hirb-unicode'
+require "hirb"
+require "hirb-unicode"
+require "launchy"
 
 module Sah
   class CLI < Thor
@@ -11,6 +12,34 @@ module Sah
     class_option :verbose,
       type: :boolean, default: false,
       desc: "Turn on/off verbose mode"
+
+    ############### browse ###################
+    desc "browse [REPO]", "Browse repository"
+    long_desc <<-LONG_DESCRIPTION
+    sah browse
+    \x5# browse current repository
+
+    sah browse REPO
+    \x5# browse ~YOUR_NAME/REPO
+
+    sah browse PROJECT/REPO
+    \x5# browse PROJECT/REPO
+    LONG_DESCRIPTION
+    def browse(arg=nil)
+      if arg
+        repository_slug, project_key = arg.split("/").reverse
+        project_key ||= "~#{config.user}"
+      else
+        remote_url = `git config --get remote.origin.url`.chomp
+        remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
+        project_key, repository_slug = $1, $2
+      end
+      res = api.show_repository(project_key, repository_slug)
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
+      Launchy.open(config.url + res.body["link"]["url"], debug: config.verbose)
+    end
 
     desc "clone REPOS", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
