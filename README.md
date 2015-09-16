@@ -66,7 +66,7 @@ If you use multiple stash, define profile(s) and specify it.
     sah fork ~USERNAME/REPO
     # fork from ~USERNAME/REPO to ~YOUR_NAME/REPO
 
-## help
+### help
 
     sah help [COMMAND]
     # Describe available commands or one specific command
