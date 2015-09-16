@@ -47,6 +47,12 @@ If you use multiple stash, define profile(s) and specify it.
     sah browse --commit COMMITHASH
     # browse COMMITHASH in current repository
 
+    sah browse --pull-request
+    # browse pull request list in current repository
+
+    sah browse --pull-request PULL_REQUEST
+    # browse PULL_REQUEST in current repository
+
 ### clone
 
     sah clone PROJECT/REPO

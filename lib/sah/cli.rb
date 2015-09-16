@@ -33,9 +33,16 @@ module Sah
 
     sah browse --commit COMMITHASH
     \x5# browse COMMITHASH in current repository
+
+    sah browse --pull-request
+    \x5# browse pull request list in current repository
+
+    sah browse --pull-request PULL_REQUEST
+    \x5# browse PULL_REQUEST in current repository
     LONG_DESCRIPTION
     method_option :branch, aliases: "-b", desc: "Show branch(es)"
     method_option :commit, aliases: "-c", desc: "Show commit"
+    method_option :"pull-request", aliases: "-r", desc: "Show pull request(s)"
     def browse(arg=nil)
       if arg
         repository_slug, project_key = arg.split("/").reverse
@@ -52,8 +59,8 @@ module Sah
 
       url = config.url + res.body["link"]["url"]
 
-      if options[:branch] && options[:commit]
-        abort "Multiple options (--branch, --commit) cannot be handled."
+      if [options[:branch], options[:commit], options[:'pull-request']].compact.count > 1
+        abort "Multiple options (--branch, --commit, --pull-request) cannot be handled."
       end
 
       case options[:branch]
@@ -74,6 +81,15 @@ module Sah
         abort 'You must specify commit hash.'
       else
         url.path = url.path.sub('/browse', "/commits/#{options['commit']}")
+      end
+
+      case options[:"pull-request"]
+      when nil
+        # skip
+      when "pull-request"
+        url.path = url.path.sub('/browse', "/pull-requests")
+      else
+        url.path = url.path.sub('/browse', "/pull-requests/#{options[:'pull-request']}/overview")
       end
 
       Launchy.open(url, debug: config.verbose)
