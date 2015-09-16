@@ -13,7 +13,6 @@ module Sah
       type: :boolean, default: false,
       desc: "Turn on/off verbose mode"
 
-    ############### browse ###################
     desc "browse [REPO]", "Browse repository"
     long_desc <<-LONG_DESCRIPTION
     sah browse
