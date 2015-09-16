@@ -18,7 +18,7 @@ module Sah
       end
     end
 
-    def fork_repo(project, repo, name=nil)
+    def fork_repository(project, repo, name=nil)
       body = {slug: repo}
       body = body.merge(name: name) if name
 
@@ -29,7 +29,7 @@ module Sah
       end
     end
 
-    def create_repo(project, repo)
+    def create_repository(project, repo)
       @conn.post do |req|
         req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos"
         req.headers['Content-Type'] = 'application/json'

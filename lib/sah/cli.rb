@@ -138,7 +138,7 @@ module Sah
       repository_slug = (
         options[:name] || File.basename(`git rev-parse --show-toplevel`).chomp
       )
-      res = api.create_repo(project_key, repository_slug)
+      res = api.create_repository(project_key, repository_slug)
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
@@ -171,7 +171,7 @@ module Sah
         remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
         project_key, repository_slug = $1, $2
       end
-      res = api.fork_repo(project_key, repository_slug, options[:name])
+      res = api.fork_repository(project_key, repository_slug, options[:name])
       if res.body.key? "errors"
         abort res.body["errors"].first["message"]
       end
