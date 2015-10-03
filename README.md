@@ -1,6 +1,6 @@
 # Sah
 
-Sah is command line util for [Atlassian Stash](https://www.atlassian.com/software/stash).
+Sah is command line util for [Atlassian Bitbucket Server](https://www.atlassian.com/software/bitbucket/server).
 
 This project was heavily inspired by the [hub](https://hub.github.com/).
 
@@ -14,7 +14,7 @@ This project was heavily inspired by the [hub](https://hub.github.com/).
     git config [--global] sah.profile.default.password "freq440@gmail.com"
     git config [--global] sah.profile.default.url "https://exmaple.com"
 
-If you use multiple stash, define profile(s) and specify it.
+If you use multiple Bitbucket Server, define profile(s) and specify it.
 
     git config [--global] sah.profile.my_company.user "jane"
     git config [--global] sah.profile.my_company.password "jane@example.jp"

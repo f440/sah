@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["f440"]
   spec.email         = ["freq440@gmail.com"]
 
-  spec.summary       = "Command line util for atlassian stash"
-  spec.description   = "Sah is command line util for Atlassian Stash."
+  spec.summary       = "Command line util for Atlassian Bitbucket Server"
+  spec.description   = "Sah is command line util for Atlassian Bitbucket Server."
   spec.homepage      = "https://github.com/f440/sah"
   spec.license       = "MIT"
 
