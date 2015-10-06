@@ -4,11 +4,11 @@ Sah is command line util for [Atlassian Bitbucket Server](https://www.atlassian.
 
 This project was heavily inspired by the [hub](https://hub.github.com/).
 
-## Installation
+## (not impremented) Installation
 
     gem install sah
 
-## Configuration
+## (not impremented) Configuration
 
     git config [--global] sah.profile.default.user "f440"
     git config [--global] sah.profile.default.password "freq440@gmail.com"
@@ -27,7 +27,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
 
 ## Usage
 
-### browse
+### (not impremented) browse
 
     sah browse
     # browse current repository
@@ -56,7 +56,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah browse --pull-request PULL_REQUEST
     # browse PULL_REQUEST in current repository
 
-### clone
+### (not impremented) clone
 
     sah clone PROJECT/REPO [DIR]
     > git clone ssh://git@example.com:7999/PROJECT/REPO [DIR]
@@ -67,7 +67,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah clone ~USERNAME/REPO [DIR]
     > git clone ssh://git@example.com:7999/~USERNAME/REPO [DIR]
 
-### create
+### (not impremented) create
 
     sah create
     # create repository
@@ -80,7 +80,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     # create repository at PROJECT
     # repository name is same as the current repository
 
-### fork
+### (not impremented) fork
 
     sah fork
     # fork from current repository to ~YOUR_NAME/REPO
@@ -95,12 +95,12 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah fork ~USERNAME/REPO
     # fork from ~USERNAME/REPO to ~YOUR_NAME/REPO
 
-### help
+### (not impremented) help
 
     sah help [COMMAND]
     # Describe available commands or one specific command
 
-### project
+### (not impremented) project
 
     sah project
     # list projects
@@ -108,13 +108,13 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah project PROJECT
     # show project detail
 
-### pull-request
+### (not impremented) pull-request
 
     sah pull-request
     # create pull-request to upstream repository's default branch
     # open $EDITOR to edit title and description
 
-### repository
+### (not impremented) repository
 
     sah repository PROJECT
     # list repositories
@@ -122,7 +122,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah repository PROJECT REPO
     # show repository detail
 
-### upstream
+### (not impremented) upstream
 
     sah upstream
     # show upstream information
@@ -130,7 +130,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah upstream --add-remote [--fetch-pull-request] [--prevent-push] [--remote-name=REMOTE-NAME]
     # add upstream to remote settings
 
-#### configutration
+#### (not impremented) configutration
 
 - `git config --global sah.config.upstream-fetch-pull-request true`  
   (the same as `--fetch-pull-request` option)  
@@ -142,7 +142,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
   (the same as `--remote-name` option)  
   Setting this option to any value will specify git remote name of upstream repository.
 
-### user
+### (not impremented) user
 
     sah user
     # list users
@@ -150,7 +150,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah user USER
     # show user detail
 
-### version
+### (not impremented) version
 
     sah version
     # Display the version of this command
@@ -159,12 +159,6 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
 
 - `git config --global sah.config.protocol [ssh|http]`  
   Setting this option to specify git protocol. (default: ssh)
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec sah` to use the gem in this directory, ignoring other installed copies of this gem.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
