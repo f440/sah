@@ -72,7 +72,7 @@ func main() {
 			Name:  "version",
 			Usage: "Show version",
 			Action: func(c *cli.Context) {
-				// TODO
+				print(app.Version, "\n")
 			},
 		},
 	}

@@ -150,7 +150,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah user USER
     # show user detail
 
-### (not impremented) version
+### version
 
     sah version
     # Display the version of this command
