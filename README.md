@@ -115,10 +115,10 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
 
 ### upstream
 
-    upstream
+    sah upstream
     # show upstream information
 
-    upstream --add-remote [--fetch-pull-request] [--prevent-push]
+    sah upstream --add-remote [--fetch-pull-request] [--prevent-push]
     # add upstream to remote settings
 
 #### configutration
