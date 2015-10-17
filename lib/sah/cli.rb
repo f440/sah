@@ -3,6 +3,7 @@ require "thor"
 require "hirb"
 require "hirb-unicode"
 require "launchy"
+require "tempfile"
 
 module Sah
   class CLI < Thor
@@ -202,6 +203,86 @@ module Sah
       end
     end
 
+    desc "pull-request", "Create pull request"
+    map %w(pr pull-request) => "pull_request"
+    long_desc <<-LONG_DESCRIPTION
+    sah pull-request
+    \x5# create pull-request to upstream repository's default branch
+    \x5# open $EDITOR to edit title and body
+
+    \x5sah pull-request [--source,-s PROJECT/REPOSITORY:BRANCH
+    \x5                 [--target,-t PROJECT/REPOSITORY:BRANCH
+    \x5                 [--message,-m MESSAGE]
+    \x5                 [--reviewer,-r REVIEWER1 REVIEWER2 ...]
+    LONG_DESCRIPTION
+    method_option :source, aliases: "-s", desc: "Set source project/repository:branch"
+    method_option :target, aliases: "-t", desc: "Set target project/repository:branch"
+    method_option :title, desc: "Set title"
+    method_option :description, desc: "Set description"
+    method_option :reviewer,
+      aliases: "-r", type: :array, desc: "Set reviwer(s)"
+    def pull_request
+      source_project, source_repository, source_branch = nil, nil, nil
+      if options[:source]
+        m = options[:source].match(%r{^([^/:]+)/([^/:]+):([^/:]+)$})
+        if m.nil?
+          abort "Invalid format: --source #{options[:source]}"
+        end
+        source_project, source_repository, source_branch = $1, $2, $3
+      else
+        remote_url = `git config --get remote.origin.url`.chomp
+        remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
+        source_project, source_repository = $1, $2
+        source_branch = current_branch
+      end
+      source = {project: source_project, repository: source_repository,
+                branch: source_branch}
+
+      target_project, target_repository, target_branch = nil, nil, nil
+      if options[:target]
+        m = options[:target].match(%r{^([^/:]+)/([^/:]+):([^/:]+)$})
+        if m.nil?
+          abort "Invalid format: --target #{options[:target]}"
+        end
+        target_project, target_repository, target_branch = $1, $2, $3
+      else
+        upstream = upstream_repository
+        target_project = upstream["origin"]["project"]["key"]
+        target_repository = upstream["origin"]["slug"]
+        res = api.show_branches(target_project, target_repository)
+        if res.body.key? "errors"
+          abort res.body["errors"].first["message"]
+        end
+        branches = res.body
+        target_branch = branches["values"].find{|b| b["isDefault"] }["displayId"]
+      end
+      target = {project: target_project, repository: target_repository,
+                branch: target_branch}
+
+      puts "%s/%s:%s => %s/%s:%s" % [
+        source[:project], source[:repository], source[:branch],
+        target[:project], target[:repository], target[:branch],
+      ]
+
+      title = options[:title] || (
+        puts "Edit title... (press enter key)"
+        STDIN.gets
+        open_editor.strip
+      )
+      description = options[:description] || (
+        puts "Edit description... (press enter key)"
+        STDIN.gets
+        open_editor.strip
+      )
+      reviewers = options[:reviewer] || []
+
+      res = api.create_pull_request source, target, title, description, reviewers
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
+      puts res.body["links"]["self"].first["href"]
+    end
+
     desc "repository PROJECT[/REPOS]", "Show repository information"
     long_desc <<-LONG_DESCRIPTION
     sah repository PROJECT
@@ -242,22 +323,8 @@ module Sah
     method_option :"fetch-pull-request", desc: "Fetch pull requests"
     method_option :"prevent-push", desc: "Prevent push to upstream"
     def upstream
-      remote_url = `git config --get remote.origin.url`.chomp
-      remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
-      project, repository = $1, $2
-
-      res = api.show_repository(project, repository)
-      if res.body.key? "errors"
-        abort res.body["errors"].first["message"]
-      end
-
-      repository = res.body
-      unless repository.key? "origin"
-        abort "Upstream repos does not exist."
-      end
-
       upstream_url =
-        repository["origin"]["links"]["clone"].find{ |e| e["name"] == config.protocol }["href"]
+        upstream_repository["origin"]["links"]["clone"].find{ |e| e["name"] == config.protocol }["href"]
 
       if options[:"add-remote"]
         system "git", "remote", "add", "upstream", upstream_url
@@ -312,6 +379,35 @@ module Sah
 
     def api
       @api ||= API.new(config)
+    end
+
+    def open_editor
+      tmp = Tempfile.new('sah')
+      editor = ENV['GIT_EDITOR'] || ENV['EDITOR'] || 'vi'
+      system(editor, tmp.path)
+      File.open(tmp.path).read
+    end
+
+    def current_branch
+      %x(/usr/local/bin/git rev-parse --abbrev-ref HEAD).chomp
+    end
+
+    def upstream_repository
+      remote_url = `git config --get remote.origin.url`.chomp
+      remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
+      project, repository = $1, $2
+
+      res = api.show_repository(project, repository)
+      if res.body.key? "errors"
+        abort res.body["errors"].first["message"]
+      end
+
+      repository = res.body
+      unless repository.key? "origin"
+        abort "Upstream repos does not exist."
+      end
+
+      repository
     end
   end
 end

@@ -18,6 +18,12 @@ module Sah
       end
     end
 
+    def show_branches(project, repository)
+      @conn.get do |req|
+        req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos/#{repository}/branches"
+      end
+    end
+
     def fork_repository(project, repo, name=nil)
       body = {slug: repo}
       body = body.merge(name: name) if name
@@ -73,6 +79,42 @@ module Sah
     def show_repository(project, repository)
       @conn.get do |req|
         req.url @config.url.path + "/rest/api/1.0/projects/#{project}/repos/#{repository}"
+      end
+    end
+
+    def create_pull_request(source, target, title="", description="", reviewers=[])
+      @conn.post do |req|
+        req.url @config.url.path +
+          "/rest/api/1.0/projects/#{target[:project]}/repos/#{target[:repository]}/pull-requests"
+        req.headers['Content-Type'] = 'application/json'
+        req.body = {
+          title: title,
+          description: description,
+          state: "OPEN",
+          closed: false,
+          fromRef: {
+            id: "refs/heads/#{source[:branch]}",
+            repository: {
+              slug: source[:repository],
+              name: nil,
+              project: {
+                key: source[:project]
+              }
+            }
+          },
+          toRef: {
+            id: "refs/heads/#{target[:branch]}",
+            repository: {
+              slug: target[:repository],
+              name: nil,
+              project: {
+                key: target[:project]
+              }
+            }
+          },
+          locked: false,
+          reviewers: reviewers.map{ |r| { user: { name: r } } }
+        }.to_json
       end
     end
   end

@@ -105,6 +105,12 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah project PROJECT
     # show project detail
 
+### pull-request
+
+   sah pull-request
+   # create pull-request to upstream repository's default branch
+   # open $EDITOR to edit title and description
+
 ### repository
 
     sah repository PROJECT
