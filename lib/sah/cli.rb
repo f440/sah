@@ -389,7 +389,7 @@ module Sah
     end
 
     def current_branch
-      %x(/usr/local/bin/git rev-parse --abbrev-ref HEAD).chomp
+      %x(git rev-parse --abbrev-ref HEAD).chomp
     end
 
     def upstream_repository
