@@ -224,7 +224,7 @@ module Sah
     def pull_request
       source_project, source_repository, source_branch = nil, nil, nil
       if options[:source]
-        m = options[:source].match(%r{^([^/:]+)/([^/:]+):([^/:]+)$})
+        m = options[:source].match(%r{^([^/:]+)/([^/:]+):([^:]+)$})
         if m.nil?
           abort "Invalid format: --source #{options[:source]}"
         end
@@ -240,7 +240,7 @@ module Sah
 
       target_project, target_repository, target_branch = nil, nil, nil
       if options[:target]
-        m = options[:target].match(%r{^([^/:]+)/([^/:]+):([^/:]+)$})
+        m = options[:target].match(%r{^([^/:]+)/([^/:]+):([^:]+)$})
         if m.nil?
           abort "Invalid format: --target #{options[:target]}"
         end
