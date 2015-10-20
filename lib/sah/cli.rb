@@ -330,7 +330,7 @@ module Sah
       if options[:"add-remote"]
         remote_name = options["remote-name"]
         remote_name = config.upstream_remote_name if remote_name.nil? || remote_name.empty?
-        system "git", "remote", "add", remoteename, upstream_url
+        system "git", "remote", "add", remote_name, upstream_url
         if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
             %x(git config --add remote.#{remote_name}.fetch \
                  '+refs/pull-requests/*:refs/remotes/#{remote_name}/pull-requests/*')
