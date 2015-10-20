@@ -316,24 +316,27 @@ module Sah
     upstream
     \x5# show upstream information
 
-    upstream --add-remote [--fetch-pull-request] [--prevent-push]
+    upstream --add-remote [--fetch-pull-request] [--prevent-push] [--remote-name=REMOTE-NAME]
     \x5# add upstream to remote settings
     LONG_DESCRIPTION
     method_option :"add-remote", desc: "Add a upstream repository to remote settings"
     method_option :"fetch-pull-request", desc: "Fetch pull requests"
     method_option :"prevent-push", desc: "Prevent push to upstream"
+    method_option :"remote-name", type: :string, default: "", desc: "Specify a remote name of upstream"
     def upstream
       upstream_url =
         upstream_repository["origin"]["links"]["clone"].find{ |e| e["name"] == config.protocol }["href"]
 
       if options[:"add-remote"]
-        system "git", "remote", "add", "upstream", upstream_url
+        remote_name = options["remote-name"]
+        remote_name = config.upstream_remote_name if remote_name.nil? || remote_name.empty?
+        system "git", "remote", "add", remoteename, upstream_url
         if config.upstream_fetch_pull_request || options[:"fetch-pull-request"]
-            %x(git config --add remote.upstream.fetch \
-                 '+refs/pull-requests/*:refs/remotes/upstream/pull-requests/*')
+            %x(git config --add remote.#{remote_name}.fetch \
+                 '+refs/pull-requests/*:refs/remotes/#{remote_name}/pull-requests/*')
         end
         if config.upstream_prevent_push || options[:"prevent-push"]
-          %x(git remote set-url --push upstream "")
+          %x(git remote set-url --push #{remote_name} "")
         end
       else
         puts upstream_url

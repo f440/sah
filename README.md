@@ -124,7 +124,7 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah upstream
     # show upstream information
 
-    sah upstream --add-remote [--fetch-pull-request] [--prevent-push]
+    sah upstream --add-remote [--fetch-pull-request] [--prevent-push] [--remote-name=REMOTE-NAME]
     # add upstream to remote settings
 
 #### configutration
@@ -135,6 +135,9 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
 - `git config --global sah.config.upstream-prevent-push true`  
   (the same as `--prevent-push` option)  
   Setting this option to true will Prevent push to upstream repository.
+- `git config --global sah.config.upstream-remote-name hoge`  
+  (the same as `--remote-name` option)  
+  Setting this option to any value will specify git remote name of upstream repository.
 
 ### user
 

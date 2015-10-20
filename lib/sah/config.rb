@@ -4,12 +4,14 @@ module Sah
   class Config
     attr_accessor :user, :password, :url,
       :upstream_fetch_pull_request, :upstream_prevent_push,
+      :upstream_remote_name,
       :protocol, :verbose
 
     def initialize(profile, verbose: false)
       @user, @password, @url = nil, nil, nil
       @upstream_fetch_pull_request = false
       @upstream_prevent_push = false
+      @upstream_remote_name = "upstream"
       @protocol = "ssh"
       @verbose = verbose
 
@@ -28,6 +30,8 @@ module Sah
           @upstream_fetch_pull_request = ($1 == "true")
         when /#{config_prefix}\.upstream-prevent-push (.*)$/
           @upstream_prevent_push = ($1 == "true")
+        when /#{config_prefix}\.upstream-remote-name (.*)$/
+          @upstream_remote_name = $1
         when /#{config_prefix}\.protocol (.*)$/
           @protocol = $1
         end
