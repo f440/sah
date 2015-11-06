@@ -1,9 +1,10 @@
 require "sah"
+require "open3"
+require "tempfile"
 require "thor"
 require "hirb"
 require "hirb-unicode"
 require "launchy"
-require "tempfile"
 
 module Sah
   class CLI < Thor
@@ -404,7 +405,7 @@ module Sah
     end
 
     def remotes
-      %x(git remote).split
+      Open3.capture3('git remote').first.split
     end
 
     def remote(name)
