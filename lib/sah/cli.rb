@@ -19,6 +19,9 @@ module Sah
     sah browse
     \x5# browse current repository
 
+    sah browse REMOTE
+    \x5# browse remote repository named REMOTE
+
     sah browse REPO
     \x5# browse ~YOUR_NAME/REPO
 
@@ -45,8 +48,13 @@ module Sah
     method_option :"pull-request", aliases: "-r", desc: "Show pull request(s)"
     def browse(arg=nil)
       if arg
-        repository_slug, project_key = arg.split("/").reverse
-        project_key ||= "~#{config.user}"
+        if remotes.include? arg
+          remote(arg).match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
+          project_key, repository_slug = $1, $2
+        else
+          repository_slug, project_key = arg.split("/").reverse
+          project_key ||= "~#{config.user}"
+        end
       else
         remote_url = `git config --get remote.origin.url`.chomp
         remote_url.match %r%/([^/]+)/([^/]+?)(?:\.git)?$%
@@ -393,6 +401,14 @@ module Sah
 
     def current_branch
       %x(git rev-parse --abbrev-ref HEAD).chomp
+    end
+
+    def remotes
+      %x(git remote).split
+    end
+
+    def remote(name)
+      %x(git remote show "#{name}").scan(/(?<=Fetch URL: ).*?\.git/).first
     end
 
     def upstream_repository

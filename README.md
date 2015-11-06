@@ -32,6 +32,9 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     sah browse
     # browse current repository
 
+    sah browse REMOTE
+    # browse remote repository named REMOTE
+
     sah browse REPO
     # browse ~YOUR_NAME/REPO
 
