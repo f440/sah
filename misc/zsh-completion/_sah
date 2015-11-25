@@ -1,0 +1,34 @@
+#compdef sah
+
+_sah() {
+    local -a commands
+    commands=(
+        'browse: Browse repository'
+        'clone: Clone repository'
+        'create: Create repository'
+        'fork: Fork repository'
+        'help: Describe available commands or one specific command'
+        'project: Show project information'
+        'pull-request: Create pull request'
+        'repository: Show repository information'
+        'upstream: Show upstream information'
+        'user: Show user information'
+        'version: Display the version of this command'
+    )
+
+    if (( CURRENT == 2 )); then
+        _describe -t commands "commands" commands
+    elif (( CURRENT == 3)); then
+        case $words[2] in
+            help)
+                _describe -t commands "commands" commands
+                ;;
+            *)
+                ;;
+        esac
+    fi
+
+    return
+}
+
+_sah "$@"
