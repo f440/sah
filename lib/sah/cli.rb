@@ -106,16 +106,16 @@ module Sah
 
     desc "clone REPOS", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
-    sah clone PROJECT/REPO
-    \x5> git clone ssh://git@example.com:7999/PROJECT/REPO
+    sah clone PROJECT/REPO [DIR]
+    \x5> git clone ssh://git@example.com:7999/PROJECT/REPO [DIR]
 
-    sah clone REPO
-    \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/REPO
+    sah clone REPO [DIR]
+    \x5> git clone ssh://git@example.com:7999/~YOUR_NAME/REPO [DIR]
 
-    sah clone ~USERNAME/REPO
-    \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO
+    sah clone ~USERNAME/REPO [DIR]
+    \x5> git clone ssh://git@example.com:7999/~USERNAME/REPO [DIR]
     LONG_DESCRIPTION
-    def clone(arg)
+    def clone(arg, dir=nil)
       repository_slug, project_key = arg.split("/").reverse
       project_key ||= "~#{config.user}"
       res = api.show_repository(project_key, repository_slug)
@@ -125,7 +125,9 @@ module Sah
       repository = res.body
       remote_url =
         repository["links"]["clone"].find{ |e| e["name"] == config.protocol }["href"]
-      system "git", "clone", remote_url
+      options = ["clone", remote_url]
+      options << dir if dir
+      system "git", *options
     end
 
     desc "create [PROJECT]", "Create repository"

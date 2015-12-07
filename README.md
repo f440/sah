@@ -58,14 +58,14 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
 
 ### clone
 
-    sah clone PROJECT/REPO
-    > git clone ssh://git@example.com:7999/PROJECT/REPO
+    sah clone PROJECT/REPO [DIR]
+    > git clone ssh://git@example.com:7999/PROJECT/REPO [DIR]
 
-    sah clone REPO
-    > git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO
+    sah clone REPO [DIR]
+    > git clone ssh://git@example.com:7999/~YOUR_NAME/ERPO [DIR]
 
-    sah clone ~USERNAME/REPO
-    > git clone ssh://git@example.com:7999/~USERNAME/REPO
+    sah clone ~USERNAME/REPO [DIR]
+    > git clone ssh://git@example.com:7999/~USERNAME/REPO [DIR]
 
 ### create
 
