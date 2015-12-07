@@ -104,7 +104,7 @@ module Sah
       Launchy.open(url, debug: config.verbose)
     end
 
-    desc "clone REPOS", "Clone repository"
+    desc "clone REPO [DIR]", "Clone repository"
     long_desc <<-LONG_DESCRIPTION
     sah clone PROJECT/REPO [DIR]
     \x5> git clone ssh://git@example.com:7999/PROJECT/REPO [DIR]
@@ -294,7 +294,7 @@ module Sah
       puts res.body["links"]["self"].first["href"]
     end
 
-    desc "repository PROJECT[/REPOS]", "Show repository information"
+    desc "repository PROJECT[/REPO]", "Show repository information"
     long_desc <<-LONG_DESCRIPTION
     sah repository PROJECT
     \x5# list repositories
