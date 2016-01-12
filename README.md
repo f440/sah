@@ -10,6 +10,9 @@ This project was heavily inspired by the [hub](https://hub.github.com/).
 
 ## Configuration
 
+
+### profile
+
     git config [--global] sah.profile.default.user "f440"
     git config [--global] sah.profile.default.password "freq440@gmail.com"
     git config [--global] sah.profile.default.url "https://exmaple.com"
@@ -24,6 +27,16 @@ If you use multiple Bitbucket Server, define profile(s) and specify it.
     or
     export SAH_DEFAULT_PROFILE=my_company
     sah SUB_COMMAND
+
+### format
+
+The formatting output can use either table(default) or json.
+
+    sah SUB_COMMAND --format json
+    or
+    export SAH_DEFAULT_FORMAT=json
+    sah SUB_COMMAND
+
 
 ## Usage
 

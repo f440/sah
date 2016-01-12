@@ -5,14 +5,15 @@ module Sah
     attr_accessor :user, :password, :url,
       :upstream_fetch_pull_request, :upstream_prevent_push,
       :upstream_remote_name,
-      :protocol, :verbose
+      :protocol, :format, :verbose
 
-    def initialize(profile, verbose: false)
+    def initialize(profile, verbose: false, format: :table)
       @user, @password, @url = nil, nil, nil
       @upstream_fetch_pull_request = false
       @upstream_prevent_push = false
       @upstream_remote_name = "upstream"
       @protocol = "ssh"
+      @format = format
       @verbose = verbose
 
       profile_prefix = "sah\.profile\.#{profile}"
@@ -42,6 +43,9 @@ module Sah
       end
       unless ["ssh", "http"].include? @protocol
         abort "protocol must be set to ssh or http: #{@protocol}"
+      end
+      unless ["json", "table"].include? @format
+        abort "format must be set to json or table: #{@format}"
       end
     end
   end

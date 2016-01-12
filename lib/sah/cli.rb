@@ -2,8 +2,6 @@ require "sah"
 require "open3"
 require "tempfile"
 require "thor"
-require "hirb"
-require "hirb-unicode"
 require "launchy"
 
 module Sah
@@ -14,6 +12,9 @@ module Sah
     class_option :verbose,
       type: :boolean, default: false,
       desc: "Turn on/off verbose mode"
+    class_option :format,
+      type: :string, default: (ENV["SAH_DEFAULT_FORMAT"] || "table"),
+      desc: "Set output format"
 
     desc "browse [REPO]", "Browse repository"
     long_desc <<-LONG_DESCRIPTION
@@ -203,14 +204,14 @@ module Sah
           abort res.body["errors"].first["message"]
         end
         project = res.body
-        puts Hirb::Helpers::AutoTable.render(project, headers: false)
+        puts formatter.render(project, headers: false)
       else
         res = api.list_project
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         projects = res.body["values"].sort_by{|e| e["id"].to_i }
-        puts Hirb::Helpers::AutoTable.render(projects, fields: %w(id key name description))
+        puts formatter.render(projects, fields: %w(id key name description))
       end
     end
 
@@ -310,14 +311,14 @@ module Sah
           abort res.body["errors"].first["message"]
         end
         repository = res.body
-        puts Hirb::Helpers::AutoTable.render(repository, headers: false)
+        puts formatter.render(repository, headers: false)
       else
         res = api.list_repository(project_key)
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         repositories = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
-        puts Hirb::Helpers::AutoTable.render(repositories, fields: %w(id slug name))
+        puts formatter.render(repositories, fields: %w(id slug name))
       end
     end
 
@@ -369,14 +370,14 @@ module Sah
           abort res.body["errors"].first["message"]
         end
         user = res.body
-        puts Hirb::Helpers::AutoTable.render(user, headers: false)
+        puts formatter.render(user, headers: false)
       else
         res = api.list_user
         if res.body.key? "errors"
           abort res.body["errors"].first["message"]
         end
         users = (res.body["values"] || []).sort_by{|e| e["id"].to_i }
-        puts Hirb::Helpers::AutoTable.render(users, fields: %w(id slug name displayName))
+        puts formatter.render(users, fields: %w(id slug name displayName))
       end
     end
 
@@ -388,11 +389,17 @@ module Sah
     private
 
     def config
-      @config ||= Config.new(options[:profile], verbose: options[:verbose])
+      @config ||= Config.new(options[:profile],
+                             verbose: options[:verbose],
+                             format: options[:format])
     end
 
     def api
       @api ||= API.new(config)
+    end
+
+    def formatter
+      @formatter ||= Formatter.new(format: options[:format])
     end
 
     def open_editor
