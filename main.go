@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"os"
-
-	"./config"
-	"./profile"
+	"sort"
+	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/f440/sah/api"
+	"github.com/f440/sah/config"
+	"github.com/f440/sah/profile"
+	"github.com/skratchdot/open-golang/open"
 )
 
 func main() {
@@ -39,6 +43,27 @@ func main() {
 			Usage: "browse repository",
 			Action: func(c *cli.Context) {
 				// TODO
+				profileName := c.GlobalString("profile")
+				profile := profile.NewProfile(profileName)
+
+				if len(c.Args()) == 0 {
+					fmt.Println("option must be set")
+					return
+				}
+				options := sort.StringSlice(strings.Split(c.Args()[0], "/"))
+				var project, repo string
+				if len(options) == 1 {
+					project = "~" + profile.User
+					repo = options[0]
+				} else {
+					project = options[0]
+					repo = options[1]
+				}
+
+				ret := api.ShowRepository(profileName, project, repo)
+				link := ret.(map[string]interface{})["link"]
+				path := link.(map[string]interface{})["url"]
+				open.Run(profile.URL + path.(string))
 			},
 		},
 		{
