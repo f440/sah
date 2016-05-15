@@ -331,9 +331,9 @@ module Sah
     upstream --add-remote [--fetch-pull-request] [--prevent-push] [--remote-name=REMOTE-NAME]
     \x5# add upstream to remote settings
     LONG_DESCRIPTION
-    method_option :"add-remote", desc: "Add a upstream repository to remote settings"
-    method_option :"fetch-pull-request", desc: "Fetch pull requests"
-    method_option :"prevent-push", desc: "Prevent push to upstream"
+    method_option :"add-remote", type: :boolean, desc: "Add a upstream repository to remote settings"
+    method_option :"fetch-pull-request", type: :boolean, desc: "Fetch pull requests"
+    method_option :"prevent-push", type: :boolean, desc: "Prevent push to upstream"
     method_option :"remote-name", type: :string, default: "", desc: "Specify a remote name of upstream"
     def upstream
       upstream_url =
