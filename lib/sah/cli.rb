@@ -67,7 +67,7 @@ module Sah
         abort res.body["errors"].first["message"]
       end
 
-      url = res.body["links"]["self"].first["href"]
+      url = URI.parse(res.body["links"]["self"].first["href"])
 
       if [options[:branch], options[:commit], options[:'pull-request']].compact.count > 1
         abort "Multiple options (--branch, --commit, --pull-request) cannot be handled."
