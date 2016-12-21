@@ -75,13 +75,13 @@ module Sah
 
       case options[:branch]
       when nil
-        url.query =
-          URI.encode_www_form([["at", "refs/heads/#{current_branch}"]])
+        # skip
       when "branch"
         url.path = url.path.sub('/browse', '/branches')
       else
+        url.path = url.path.sub('/browse', '/commits')
         url.query =
-          URI.encode_www_form([["at", "refs/heads/#{options['branch']}"]])
+          URI.encode_www_form([["until", "refs/heads/#{options['branch']}"]])
       end
 
       case options[:commit]
